@@ -18,5 +18,6 @@ public class BlobTriggerJava2 {
         final ExecutionContext context
     ) {
         context.getLogger().info("Java Blob trigger function processed a blob. Name: " + name + "\n  Size: " + content.length + " Bytes");
+        context.getLogger().info("Sucessful Trigger");
     }
 }
