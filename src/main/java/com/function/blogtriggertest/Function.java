@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -59,6 +60,8 @@ public class Function {
     "AccountKey=OtciLg/q+q+5Kt3gepXmkxftIsTjOYC0CrkWqyh9MARfXcMqwBszfi71Ni5tkWx0+r4Lf4Bf7vPJQMS1jQMqAw==;EndpointSuffix=core.windows.net";
     File downloadedFile = null;
     
+    String csvStorageLocation = "C:/home/site/wwwroot";
+
     @FunctionName("BlobTriggerJava")
     @StorageAccount("AzureWebJobsStorage")
     public void run(
@@ -87,7 +90,7 @@ public class Function {
 
             CloudBlockBlob blob = container.getBlockBlobReference(name+".csv");
 
-            blob.downloadToFile("C:/Users/nickl/azuredownload/"+name+".csv");
+            blob.downloadToFile(csvStorageLocation+name+".csv");
             convertToJson(name);
         } catch (Exception e) {
             System.out.println("1st try");
@@ -97,7 +100,7 @@ public class Function {
     }
 
     public String convertToJson(String name) {
-        try(BufferedReader in = new BufferedReader(new FileReader("C:/Users/nickl/azuredownload/"+name+".csv"));){
+        try(BufferedReader in = new BufferedReader(new FileReader(csvStorageLocation+name+".csv"));){
 			CsvToBean<userFile> csvToBean = new CsvToBeanBuilder<userFile>(in)
 					.withType(userFile.class)
 					.withIgnoreLeadingWhiteSpace(true)
@@ -162,7 +165,7 @@ public class Function {
             */
            
             try{
-                FileWriter writer = new FileWriter("C:/Users/nickl/azuredownload/"+name+"-uploaded.csv");
+                FileWriter writer = new FileWriter(csvStorageLocation+name+"-uploaded.csv");
                 ColumnPositionMappingStrategy mappingStrategy=
                 new ColumnPositionMappingStrategy();
                 mappingStrategy.setType(userFileConfig.class);
@@ -192,7 +195,10 @@ public class Function {
                 blobClient = storageAccount.createCloudBlobClient();
                 containerUploaded = blobClient.getContainerReference("completedcsvfiles");
                 CloudBlockBlob uploadBlob = containerUploaded.getBlockBlobReference(name+"-uploaded.csv");
-                uploadBlob.uploadFromFile("C:/Users/nickl/azuredownload/"+name+"-uploaded.csv");
+                uploadBlob.uploadFromFile(csvStorageLocation+name+"-uploaded.csv");
+                Files.deleteIfExists(downloadedFile.toPath());
+                Files.deleteIfExists(writer.toPath());
+                
 
             }catch(Exception e){
                 System.out.println("3rd try");
