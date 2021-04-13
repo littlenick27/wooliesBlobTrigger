@@ -197,8 +197,8 @@ public class Function {
                 CloudBlockBlob uploadBlob = containerUploaded.getBlockBlobReference(name+"-uploaded.csv");
                 uploadBlob.uploadFromFile(csvStorageLocation+name+"-uploaded.csv");
                 Files.deleteIfExists(downloadedFile.toPath());
-                Files.deleteIfExists(Paths.get(csvStorageLocation+name+"-uploaded.csv"));
-                
+                //Files.deleteIfExists(Paths.get(csvStorageLocation+name+"-uploaded.csv"));
+                boolean sucess = new File(csvStorageLocation+name+"-uploaded.csv").delete();
 
             }catch(Exception e){
                 System.out.println("3rd try");
